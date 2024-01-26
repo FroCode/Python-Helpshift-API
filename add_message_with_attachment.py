@@ -1,19 +1,13 @@
-import json
+import sys
 import requests
 import mimetypes
 
 
-DOMAIN = "frocode"
-API_KEY = "4bb131e771f242e063c01b7064b150ce"
-ATTACHMENT_FILE_PATH = "./nkz.jpg"
-TEST_PAYLOAD = {"email": "test@mail.com",
-                "message-body": "Attachments Demo",
-                "title": "Test issue title",
-                "tags": json.dumps(["foo"]),
-                "meta": json.dumps({"test": 1}),
-                "author-name": "Test author",
-                "platform-type": "web",
-                "app-id": "frocode_app_20240120223034933-0844c0ceee5b133"}
+DOMAIN = "<DOMAIN>"
+API_KEY = "<API_KEY>"
+ATTACHMENT_FILE_PATH = "<ATTACHMENT FILE PATH>"
+TEST_PAYLOAD = {"message-body": "Add message with attachment",
+                "message-type": "Text"}
 
 
 def construct_attachment_object(attachment_url):
@@ -29,12 +23,17 @@ def make_api_call(api_endpoint, api_key, payload, attachment={}):
                              auth=(api_key, ""),
                              data=payload,
                              files=attachment)
-    print ("API response status {0}".format(response.status_code))
-    print ("API response {0}".format(response.json()))
+    print "API response status {0}".format(response.status_code)
+    print "API response {0}".format(response.json())
 
 
 if __name__ == "__main__":
-    api_endpoint = 'https://api.helpshift.com/v1/{0}/issues'.format(DOMAIN)
+    if len(sys.argv) != 2:
+        print "Please pass issue_id as second argument to script."
+        print "Usage: python add_message_with_attachment.py <ISSUE ID>"
+        exit(1)
+    issue_id = sys.argv[1]
+    api_endpoint = "https://api.helpshift.com/v1/{0}/issues/{1}/messages".format(DOMAIN, issue_id)
     attachment_object = construct_attachment_object(ATTACHMENT_FILE_PATH)
     make_api_call(api_endpoint,
                   API_KEY,
